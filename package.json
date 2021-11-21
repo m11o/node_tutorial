@@ -1,0 +1,19 @@
+{
+  "name": "node_tutorial",
+  "version": "0.0.1",
+  "description": "node tutorial",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/masahito1997/node_tutorial.git"
+  },
+  "author": "Masahito Osako",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/masahito1997/node_tutorial/issues"
+  },
+  "homepage": "https://github.com/masahito1997/node_tutorial#readme"
+}
