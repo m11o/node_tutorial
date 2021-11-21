@@ -1,4 +1,5 @@
 const http = require('http')
+const morgan = require('morgan')
 const express = require('express')
 const path = require('path')
 const bodyparser = require('body-parser')
@@ -16,6 +17,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/chatapp', err => {
   }
 })
 
+app.use(morgan('combined'))
 app.use(bodyparser.urlencoded({ extended: true }))
 
 app.set('views', path.join(__dirname, 'views'))
