@@ -1,6 +1,7 @@
 const http = require('http')
 const express = require('express')
 const path = require('path')
+const bodyparser = require('body-parser')
 const mongoose = require('mongoose')
 
 const Message = require('./schema/Message')
@@ -15,14 +16,23 @@ mongoose.connect('mongodb://127.0.0.1:27017/chatapp', err => {
   }
 })
 
+app.use(bodyparser.urlencoded({ extended: true }))
+
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'pug')
 
 app.get('/', (req, res, next) => {
-  return res.render('index', { title: 'Hello World' })
+  Message.find({}, (err, msgs) => {
+    if (err) throw err
+    return res.render('index', { messages: msgs })
+  })
 })
 
 app.get('/update', (req, res, next) => {
+  return res.render('update')
+})
+
+app.post('/update', (req, res, next) => {
   const newMessage = new Message({
     username: req.body.username,
     message: req.body.message
