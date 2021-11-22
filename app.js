@@ -15,6 +15,7 @@ const SessionsController = require('./controllers/SessionsController')
 const RegistrationsController = require('./controllers/RegistrationsController')
 
 const passportConfig = require('./config/passport')
+const logger = require('./lib/logger')
 
 const app = express()
 
