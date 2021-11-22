@@ -3,7 +3,7 @@ const Message = require('../schema/Message')
 
 module.exports = {
   index: (_req, res, _next) => {
-    return res.render('messages/index')
+    return res.render('messages/new')
   },
   create: (req, res, next) => {
     User.findById(req.session.passport.user, (err, user) => {
