@@ -8,9 +8,6 @@ const fileupload = require('express-fileupload')
 const passport = require('passport')
 const session = require('express-session')
 
-const User = require('./schema/User')
-const Message = require('./schema/Message')
-
 const RootController = require('./controllers/RootController')
 const MessagesController = require('./controllers/MessagesController')
 const SessionsController = require('./controllers/SessionsController')
