@@ -8,6 +8,7 @@ const fileupload = require('express-fileupload')
 const passport = require('passport')
 const session = require('express-session')
 const MongoStore = require('connect-mongo')
+const helmet = require('helmet')
 
 const RootController = require('./controllers/RootController')
 const MessagesController = require('./controllers/MessagesController')
@@ -28,6 +29,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/chatapp', err => {
 })
 
 app.use(morgan('combined'))
+app.use(helmet())
 app.use(bodyparser.urlencoded({ extended: true }))
 
 app.use(session({
