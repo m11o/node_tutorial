@@ -75,6 +75,7 @@ app.post('/signup', fileupload(), RegistrationsController.create)
 
 app.get('/login', SessionsController.new)
 app.post('/login', passport.authenticate('local'), SessionsController.create)
+app.delete('/logout', SessionsController.destroy)
 
 app.get('/messages/new', csrfProtection, MessagesController.index)
 app.post('/messages', fileupload(), csrfProtection, MessagesController.create)
