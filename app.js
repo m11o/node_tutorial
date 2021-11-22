@@ -7,6 +7,7 @@ const mongoose = require('mongoose')
 const fileupload = require('express-fileupload')
 const passport = require('passport')
 const session = require('express-session')
+const MongoStore = require('connect-mongo')
 
 const RootController = require('./controllers/RootController')
 const MessagesController = require('./controllers/MessagesController')
@@ -28,7 +29,17 @@ mongoose.connect('mongodb://127.0.0.1:27017/chatapp', err => {
 app.use(morgan('combined'))
 app.use(bodyparser.urlencoded({ extended: true }))
 
-app.use(session({ secret: 'hoge', resave: true, saveUninitialized: false }))  // need to use environment variables
+app.use(session({
+  secret: 'hoge',
+  resave: true,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    client: mongoose.connection.client,
+    mongooseConnection: mongoose.connection,
+    db: 'session',
+    ttl: 14 * 24 * 60 * 60
+  })
+}))
 app.use(passport.initialize())
 app.use(passport.session())
 
