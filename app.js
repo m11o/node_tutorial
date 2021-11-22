@@ -75,5 +75,22 @@ app.post('/login', passport.authenticate('local'), SessionsController.create)
 app.get('/messages/new', MessagesController.index)
 app.post('/messages', fileupload(), MessagesController.create)
 
+// Error handling
+app.use((_req, res, _next) => {
+  const err = new Error('Not Found')
+
+  err.status = 404
+  return res.render('common/error', { status: err.status })
+})
+
+app.use((err, _req, res, _next) => {
+  res.status(err.status || 500)
+
+  return res.render('common/error', {
+    status: err.status || 500,
+    message: err.message
+  })
+})
+
 const server = http.createServer(app)
 server.listen(3000)
