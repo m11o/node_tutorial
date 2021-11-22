@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
 
 const User = mongoose.Schema({
   username: { type: String, required: true, index: { unique: true } },
@@ -6,5 +7,13 @@ const User = mongoose.Schema({
   date: { type: Date, default: new Date() },
   avatar_path: String
 })
+
+User.methods.comparePassword = (candidatePassword, hash, next) => {
+  bcrypt.compare(candidatePassword, hash, (err, isMatch) => {
+    if (err) return next(err)
+
+    next(null, isMatch)
+  })
+}
 
 module.exports = mongoose.model('User', User)
