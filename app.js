@@ -38,6 +38,19 @@ app.set('view engine', 'pug')
 app.use('/image', express.static(path.join(__dirname, 'image')))
 app.use('/avatar', express.static(path.join(__dirname, 'avatar')))
 
+app.use((req, res, next) => {
+  if (req.isAuthenticated()) return next()
+
+  switch (req.url) {
+    case '/login':
+    case '/signup':
+      next()
+      break
+    default:
+      res.redirect('/login')
+  }
+})
+
 app.get('/', (req, res, _next) => {
   Message.find({}, (err, msgs) => {
     if (err) throw err
