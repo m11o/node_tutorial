@@ -14,5 +14,11 @@ module.exports = {
       }
       return res.redirect('/')
     })
+  },
+  destroy: (req, res, _next) => {
+    req.logout()
+    delete req.session.user
+
+    return res.redirect('/login')
   }
 }
