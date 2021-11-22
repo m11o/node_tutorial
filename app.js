@@ -52,7 +52,7 @@ app.use((req, res, next) => {
 })
 
 app.get('/', (req, res, _next) => {
-  Message.find({}, (err, msgs) => {
+  Message.find({ user: req.session.passport.user }, (err, msgs) => {
     if (err) throw err
     return res.render('index', {
       messages: msgs,
