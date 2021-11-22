@@ -14,6 +14,7 @@ const User = require('./schema/User')
 const Message = require('./schema/Message')
 
 const MessagesController = require('./controllers/MessagesController')
+const SessionsController = require('./controllers/SessionsController')
 
 const SALT_ROUNDS = 10
 
@@ -93,21 +94,8 @@ app.post('/signup', fileupload(), (req, res, next) => {
   })
 })
 
-app.get('/login', (_req, res, _next) => {
-  return res.render('login')
-})
-
-app.post('/login', passport.authenticate('local'), (req, res, next) => {
-  User.findOne({ _id: req.session.passport.user }, (err, user) => {
-    if (err || !req.session) return res.redirect('/login')
-
-    req.session.user = {
-      username: user.username,
-      avatar_path: user.avatar_path
-    }
-    return res.redirect('/')
-  })
-})
+app.get('/login', SessionsController.new)
+app.post('/login', passport.authenticate('local'), SessionsController.create)
 
 passport.use(new LocalStorage((username, password, done) => {
   User.findOne({ username: username }, (err, user) => {
