@@ -4,7 +4,12 @@ const express = require('express')
 const path = require('path')
 const bodyparser = require('body-parser')
 const mongoose = require('mongoose')
+const fileupload = require('express-fileupload')
+const passport = require('passport')
+const LocalStorage = require('passport-local').Strategy
+const session = require('express-session')
 
+const User = require('./schema/User')
 const Message = require('./schema/Message')
 
 const app = express()
@@ -20,27 +25,107 @@ mongoose.connect('mongodb://127.0.0.1:27017/chatapp', err => {
 app.use(morgan('combined'))
 app.use(bodyparser.urlencoded({ extended: true }))
 
+app.use(session({ secret: 'hoge' }))  // need to use environment variables
+app.use(passport.initialize())
+app.use(passport.session())
+
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'pug')
 
-app.get('/', (req, res, next) => {
+app.use('/image', express.static(path.join(__dirname, 'image')))
+app.use('/avatar', express.static(path.join(__dirname, 'avatar')))
+
+app.get('/', (req, res, _next) => {
   Message.find({}, (err, msgs) => {
     if (err) throw err
-    return res.render('index', { messages: msgs })
+    return res.render('index', {
+      messages: msgs,
+      user: req.session && req.session.user ? req.session.user : null
+    })
   })
 })
 
-app.get('/update', (req, res, next) => {
+app.get('/signup', (_req, res, _next) => {
+  return res.render('signup')
+})
+
+app.post('/signup', fileupload(), (req, res, next) => {
+  const avatar = req.files.avatar
+  avatar.mv('./avatar/' + avatar.name, err => {
+    if (err) throw err
+
+    const newUser = new User({
+      username: req.body.username,
+      passwoed: req.body.password,
+      avator_path: '/avator/' + avatar.name
+    })
+    newUser.save(err => {
+      if (err) throw err
+
+      return res.redirect('/')
+    })
+  })
+})
+
+app.get('/login', (_req, res, _next) => {
+  return res.render('login')
+})
+
+app.post('/login', passport.authenticate('local'), (req, res, next) => {
+  User.findOne({ _id: req.session.passport.user }, (err, user) => {
+    if (err || !req.session) return res.redirect('/login')
+
+    req.session.user = {
+      username: user.username,
+      avatar_path: user.avatar_path
+    }
+    return res.redirect('/')
+  })
+})
+
+passport.use(new LocalStorage((username, password, done) => {
+  User.findOne({ username: username }, (err, user) => {
+    if (err) return done(err)
+    if (!user) return done(null, false, { message: 'Incorrect username' })
+    if (user.password !== password) return done(null, false, { message: 'Incorrect password' })
+
+    return done(null, user)
+  })
+}))
+
+passport.serializeUser((user, done) => {
+  done(null, user._id)
+})
+
+passport.deserializeUser((id, done) => {
+  User.findOne({ _id: id }, (err, user) => {
+    done(err, user)
+  })
+})
+
+app.get('/update', (_req, res, _next) => {
   return res.render('update')
 })
 
-app.post('/update', (req, res, next) => {
-  const newMessage = new Message({
+app.post('/update', fileupload(), (req, res, next) => {
+  let messageParams = {
     username: req.body.username,
     message: req.body.message
-  })
+  }
+
+  if (req.files && req.files.image) {
+    const image = req.files.image
+    image.mv('./image/' + image.name, err => {
+      if (err) throw err
+      messageParams.image_path = '/image/' + image.name
+    })
+  }
+
+  const newMessage = new Message(messageParams)
+
   newMessage.save(err => {
     if (err) throw err
+
     return res.redirect('/')
   })
 })
