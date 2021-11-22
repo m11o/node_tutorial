@@ -134,25 +134,29 @@ app.get('/update', (_req, res, _next) => {
 })
 
 app.post('/update', fileupload(), (req, res, next) => {
-  let messageParams = {
-    username: req.body.username,
-    message: req.body.message
-  }
+  User.findById(req.session.passport.user, (err, user) => {
+    if (err) next(err)
 
-  if (req.files && req.files.image) {
-    const image = req.files.image
-    image.mv('./image/' + image.name, err => {
-      if (err) throw err
-      messageParams.image_path = '/image/' + image.name
+    let messageParams = {
+      user: user._id,
+      message: req.body.message
+    }
+
+    if (req.files && req.files.image) {
+      const image = req.files.image
+      image.mv('./image/' + image.name, err => {
+        if (err) throw err
+        messageParams.image_path = '/image/' + image.name
+      })
+    }
+
+    const newMessage = new Message(messageParams)
+
+    newMessage.save(createErr => {
+      if (createErr) throw createErr
+
+      return res.redirect('/')
     })
-  }
-
-  const newMessage = new Message(messageParams)
-
-  newMessage.save(err => {
-    if (err) throw err
-
-    return res.redirect('/')
   })
 })
 
