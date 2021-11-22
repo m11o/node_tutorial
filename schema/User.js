@@ -9,11 +9,7 @@ const User = mongoose.Schema({
 })
 
 User.methods.comparePassword = (candidatePassword, hash, next) => {
-  bcrypt.compare(candidatePassword, hash, (err, isMatch) => {
-    if (err) return next(err)
-
-    next(null, isMatch)
-  })
+  bcrypt.compare(candidatePassword, hash, (err, isMatch) => next(err, isMatch))
 }
 
 module.exports = mongoose.model('User', User)

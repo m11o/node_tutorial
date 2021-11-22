@@ -63,12 +63,12 @@ app.get('/', (req, res, _next) => {
   })
 })
 
+passportConfig(passport)
 app.get('/signup', RegistrationsController.new)
 app.post('/signup', fileupload(), RegistrationsController.create)
 
 app.get('/login', SessionsController.new)
 app.post('/login', passport.authenticate('local'), SessionsController.create)
-passportConfig()
 
 app.get('/messages/new', MessagesController.index)
 app.post('/messages', fileupload(), MessagesController.create)
