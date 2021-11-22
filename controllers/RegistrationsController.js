@@ -1,4 +1,8 @@
+const bcrypt = require('bcrypt')
+
 const User = require('../schema/User')
+
+const SALT_ROUNDS = 10
 
 module.exports = {
   new: (_req, res, _next) => {

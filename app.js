@@ -8,7 +8,6 @@ const fileupload = require('express-fileupload')
 const passport = require('passport')
 const LocalStorage = require('passport-local').Strategy
 const session = require('express-session')
-const bcrypt = require('bcrypt')
 
 const User = require('./schema/User')
 const Message = require('./schema/Message')
@@ -16,8 +15,6 @@ const Message = require('./schema/Message')
 const MessagesController = require('./controllers/MessagesController')
 const SessionsController = require('./controllers/SessionsController')
 const RegistrationsController = require('./controllers/RegistrationsController')
-
-const SALT_ROUNDS = 10
 
 const app = express()
 
