@@ -8,9 +8,12 @@ const fileupload = require('express-fileupload')
 const passport = require('passport')
 const LocalStorage = require('passport-local').Strategy
 const session = require('express-session')
+const bcrypt = require('bcrypt')
 
 const User = require('./schema/User')
 const Message = require('./schema/Message')
+
+const SALT_ROUNDS = 10
 
 const app = express()
 
@@ -54,15 +57,23 @@ app.post('/signup', fileupload(), (req, res, next) => {
   avatar.mv('./avatar/' + avatar.name, err => {
     if (err) throw err
 
-    const newUser = new User({
-      username: req.body.username,
-      password: req.body.password,
-      avator_path: '/avator/' + avatar.name
-    })
-    newUser.save(err => {
-      if (err) throw err
+    bcrypt.genSalt(SALT_ROUNDS, (saltErr, salt) => {
+      if (saltErr) throw saltErr
 
-      return res.redirect('/')
+      bcrypt.hash(req.body.password, salt, (hashErr, hash) => {
+        if (err) throw hashErr
+
+        const newUser = new User({
+          username: req.body.username,
+          password: hash,
+          avator_path: '/avator/' + avatar.name
+        })
+        newUser.save(err => {
+          if (err) throw err
+
+          return res.redirect('/')
+        })
+      })
     })
   })
 })
@@ -87,9 +98,11 @@ passport.use(new LocalStorage((username, password, done) => {
   User.findOne({ username: username }, (err, user) => {
     if (err) return done(err)
     if (!user) return done(null, false, { message: 'Incorrect username' })
-    if (user.password !== password) return done(null, false, { message: 'Incorrect password' })
+    user.comparePassword(password, user.password, (err) => {
+      if (err) return done(null, false, { message: 'Incorrect password' })
 
-    return done(null, user)
+      return done(null, user)
+    })
   })
 }))
 
