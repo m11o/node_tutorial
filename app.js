@@ -6,7 +6,6 @@ const bodyparser = require('body-parser')
 const mongoose = require('mongoose')
 const fileupload = require('express-fileupload')
 const passport = require('passport')
-const LocalStorage = require('passport-local').Strategy
 const session = require('express-session')
 
 const User = require('./schema/User')
@@ -15,6 +14,8 @@ const Message = require('./schema/Message')
 const MessagesController = require('./controllers/MessagesController')
 const SessionsController = require('./controllers/SessionsController')
 const RegistrationsController = require('./controllers/RegistrationsController')
+
+const passportConfig = require('./config/passport')
 
 const app = express()
 
@@ -67,28 +68,7 @@ app.post('/signup', fileupload(), RegistrationsController.create)
 
 app.get('/login', SessionsController.new)
 app.post('/login', passport.authenticate('local'), SessionsController.create)
-
-passport.use(new LocalStorage((username, password, done) => {
-  User.findOne({ username: username }, (err, user) => {
-    if (err) return done(err)
-    if (!user) return done(null, false, { message: 'Incorrect username' })
-    user.comparePassword(password, user.password, (err) => {
-      if (err) return done(null, false, { message: 'Incorrect password' })
-
-      return done(null, user)
-    })
-  })
-}))
-
-passport.serializeUser((user, done) => {
-  done(null, user._id)
-})
-
-passport.deserializeUser((id, done) => {
-  User.findOne({ _id: id }, (err, user) => {
-    done(err, user)
-  })
-})
+passportConfig()
 
 app.get('/messages/new', MessagesController.index)
 app.post('/messages', fileupload(), MessagesController.create)
