@@ -2,8 +2,8 @@ const User = require('../schema/User')
 const Message = require('../schema/Message')
 
 module.exports = {
-  index: (_req, res, _next) => {
-    return res.render('messages/new')
+  index: (req, res, _next) => {
+    return res.render('messages/new', { csrf: req.csrfToken() })
   },
   create: (req, res, next) => {
     User.findById(req.session.passport.user, (err, user) => {

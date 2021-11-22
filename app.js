@@ -9,6 +9,8 @@ const passport = require('passport')
 const session = require('express-session')
 const MongoStore = require('connect-mongo')
 const helmet = require('helmet')
+const csrf = require('csurf')
+const csrfProtection = csrf()
 
 const RootController = require('./controllers/RootController')
 const MessagesController = require('./controllers/MessagesController')
@@ -74,8 +76,8 @@ app.post('/signup', fileupload(), RegistrationsController.create)
 app.get('/login', SessionsController.new)
 app.post('/login', passport.authenticate('local'), SessionsController.create)
 
-app.get('/messages/new', MessagesController.index)
-app.post('/messages', fileupload(), MessagesController.create)
+app.get('/messages/new', csrfProtection, MessagesController.index)
+app.post('/messages', fileupload(), csrfProtection, MessagesController.create)
 
 // Error handling
 app.use((_req, res, _next) => {
@@ -87,7 +89,11 @@ app.use((_req, res, _next) => {
 
 app.use((err, _req, res, _next) => {
   logger.error(err)
-  res.status(err.status || 500)
+  if (err.code == 'EBADCSRFTOKEN') {
+    res.status(403)
+  } else {
+    res.status(err.status || 500)
+  }
 
   return res.render('common/error', {
     status: err.status || 500,

@@ -5,6 +5,7 @@ html(lang='ja')
   body
     h1 メッセージを保存
     form(action='/messages', method='post', encType='multipart/form-data')
+      input(type='hidden', name='_csrf', value=csrf)
       input(type='text', name='username', placeholder='名前')
       textarea(placeholder='メッセージ', name='message')
       input(type='file', name='image')
