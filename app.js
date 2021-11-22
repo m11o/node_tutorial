@@ -25,7 +25,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/chatapp', err => {
 app.use(morgan('combined'))
 app.use(bodyparser.urlencoded({ extended: true }))
 
-app.use(session({ secret: 'hoge' }))  // need to use environment variables
+app.use(session({ secret: 'hoge', resave: true, saveUninitialized: false }))  // need to use environment variables
 app.use(passport.initialize())
 app.use(passport.session())
 
