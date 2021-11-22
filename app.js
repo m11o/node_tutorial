@@ -11,6 +11,7 @@ const session = require('express-session')
 const User = require('./schema/User')
 const Message = require('./schema/Message')
 
+const RootController = require('./controllers/RootController')
 const MessagesController = require('./controllers/MessagesController')
 const SessionsController = require('./controllers/SessionsController')
 const RegistrationsController = require('./controllers/RegistrationsController')
@@ -53,15 +54,7 @@ app.use((req, res, next) => {
   }
 })
 
-app.get('/', (req, res, _next) => {
-  Message.find({ user: req.session.passport.user }, (err, msgs) => {
-    if (err) throw err
-    return res.render('index', {
-      messages: msgs,
-      user: req.session && req.session.user ? req.session.user : null
-    })
-  })
-})
+app.get('/', RootController.index)
 
 passportConfig(passport)
 app.get('/signup', RegistrationsController.new)
