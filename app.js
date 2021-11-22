@@ -56,7 +56,7 @@ app.post('/signup', fileupload(), (req, res, next) => {
 
     const newUser = new User({
       username: req.body.username,
-      passwoed: req.body.password,
+      password: req.body.password,
       avator_path: '/avator/' + avatar.name
     })
     newUser.save(err => {
