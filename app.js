@@ -84,6 +84,7 @@ app.use((_req, res, _next) => {
 })
 
 app.use((err, _req, res, _next) => {
+  logger.error(err)
   res.status(err.status || 500)
 
   return res.render('common/error', {
